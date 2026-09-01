@@ -4,7 +4,7 @@
  */
 
 export const MAP_STYLE_URL =
-  (import.meta.env.VITE_MAP_STYLE_URL as string | undefined) ??
+  (import.meta.env["VITE_MAP_STYLE_URL"] as string | undefined) ??
   "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 
 /** Initial camera: Singapore Strait — a busy AIS / maritime monitoring region. */
