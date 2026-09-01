@@ -1,24 +1,64 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { ClientOnly, createFileRoute } from "@tanstack/react-router";
+import { Suspense, lazy, useState } from "react";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+import { LayerPanel } from "@/components/map/LayerPanel";
+import { MapLegend } from "@/components/map/MapLegend";
+import { DEFAULT_VISIBILITY } from "@/components/map/MapView";
+import type { LayerId } from "@/lib/map/config";
+
+// MapLibre/Deck.gl are browser-only: lazy-load the map so SSR never touches it.
+const MapView = lazy(() => import("@/components/map/MapView"));
+
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Maritime Situation Dashboard" },
+      {
+        name: "description",
+        content:
+          "Map dashboard for maritime monitoring: SAR raster, oil slick polygons, H3 corridors, and AIS vessel tracks.",
+      },
+      { property: "og:title", content: "Maritime Situation Dashboard" },
+      {
+        property: "og:description",
+        content:
+          "Map dashboard for maritime monitoring: SAR raster, oil slick polygons, H3 corridors, and AIS vessel tracks.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: DashboardPage,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function DashboardPage() {
+  const [visibility, setVisibility] = useState(DEFAULT_VISIBILITY);
+
+  const toggle = (id: LayerId) =>
+    setVisibility((prev) => ({ ...prev, [id]: !prev[id] }));
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="dark relative h-screen w-screen overflow-hidden bg-background">
+      <h1 className="sr-only">Maritime Situation Dashboard</h1>
+      <ClientOnly
+        fallback={
+          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+            Loading map…
+          </div>
+        }
+      >
+        <Suspense
+          fallback={
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+              Loading map…
+            </div>
+          }
+        >
+          <MapView visibility={visibility} />
+        </Suspense>
+        <LayerPanel visibility={visibility} onToggle={toggle} />
+        <MapLegend visibility={visibility} />
+      </ClientOnly>
     </div>
   );
 }
