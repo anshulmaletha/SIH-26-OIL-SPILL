@@ -42,7 +42,7 @@ export default function MapView({ visibility }: MapViewProps) {
     map.addControl(new ScaleControl(), "bottom-right");
 
     const overlay = new MapboxOverlay({ interleaved: true, layers: [] });
-    map.addControl(overlay as unknown as maplibregl.IControl);
+    map.addControl(overlay as unknown as IControl);
 
     mapRef.current = map;
     overlayRef.current = overlay;
