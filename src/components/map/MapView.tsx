@@ -1,5 +1,10 @@
 import { MapboxOverlay } from "@deck.gl/mapbox";
-import maplibregl from "maplibre-gl";
+import {
+  Map as MapLibreMap,
+  NavigationControl,
+  ScaleControl,
+  type IControl,
+} from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useMemo, useRef } from "react";
 
@@ -16,7 +21,7 @@ export interface MapViewProps {
  */
 export default function MapView({ visibility }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
+  const mapRef = useRef<MapLibreMap | null>(null);
   const overlayRef = useRef<MapboxOverlay | null>(null);
 
   const layers = useMemo(() => buildLayers(visibility), [visibility]);
@@ -24,7 +29,7 @@ export default function MapView({ visibility }: MapViewProps) {
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    const map = new maplibregl.Map({
+    const map = new MapLibreMap({
       container: containerRef.current,
       style: (import.meta.env["VITE_MAP_STYLE_URL"] as string | undefined) ??
         "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
@@ -33,8 +38,8 @@ export default function MapView({ visibility }: MapViewProps) {
       pitch: INITIAL_VIEW_STATE.pitch,
       bearing: INITIAL_VIEW_STATE.bearing,
     });
-    map.addControl(new maplibregl.NavigationControl(), "top-right");
-    map.addControl(new maplibregl.ScaleControl(), "bottom-right");
+    map.addControl(new NavigationControl(), "top-right");
+    map.addControl(new ScaleControl(), "bottom-right");
 
     const overlay = new MapboxOverlay({ interleaved: true, layers: [] });
     map.addControl(overlay as unknown as maplibregl.IControl);
