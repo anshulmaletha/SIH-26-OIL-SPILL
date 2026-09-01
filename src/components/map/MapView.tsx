@@ -63,7 +63,15 @@ export default function MapView({ visibility }: MapViewProps) {
     overlayRef.current?.setProps({ layers });
   }, [layers]);
 
-  return <div ref={containerRef} className="absolute inset-0" />;
+  return (
+    <div
+      ref={containerRef}
+      className="absolute inset-0"
+      // Inline style wins over maplibre-gl.css (.maplibregl-map sets
+      // position:relative), which loads after Tailwind in the lazy chunk.
+      style={{ position: "absolute", inset: 0 }}
+    />
+  );
 }
 
 export const DEFAULT_VISIBILITY: Record<LayerId, boolean> = {
