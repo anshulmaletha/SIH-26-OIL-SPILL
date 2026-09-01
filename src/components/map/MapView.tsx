@@ -41,11 +41,16 @@ export default function MapView({ visibility }: MapViewProps) {
     map.addControl(new NavigationControl(), "top-right");
     map.addControl(new ScaleControl(), "bottom-right");
 
-    const overlay = new MapboxOverlay({ interleaved: false, layers: [] });
-    map.addControl(overlay as unknown as IControl);
+    // Attach the deck.gl overlay only after the map has fully loaded —
+    // map.transform is not ready before that, and early sync crashes.
+    map.on("load", () => {
+      if (overlayRef.current) return;
+      const overlay = new MapboxOverlay({ interleaved: false, layers });
+      overlayRef.current = overlay;
+      map.addControl(overlay as unknown as IControl);
+    });
 
     mapRef.current = map;
-    overlayRef.current = overlay;
 
     return () => {
       map.remove();
