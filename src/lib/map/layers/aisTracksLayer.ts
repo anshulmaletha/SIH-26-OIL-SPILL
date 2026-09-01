@@ -17,7 +17,8 @@ export function createAisTrackLayers(visible: boolean) {
     visible,
     data: AIS_TRACKS,
     getPath: (d) => d.path,
-    getColor: (_d, { index }) => TRACK_COLORS[index % TRACK_COLORS.length],
+    getColor: (_d, { index }) =>
+      TRACK_COLORS[index % TRACK_COLORS.length] ?? [74, 222, 128],
     getWidth: 2.5,
     widthUnits: "pixels",
     pickable: true,
