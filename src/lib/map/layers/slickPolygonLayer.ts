@@ -1,15 +1,14 @@
 import { GeoJsonLayer } from "@deck.gl/layers";
-import type { Feature, Polygon } from "geojson";
 
 import { LAYER_IDS } from "../config";
 import { SLICK_POLYGONS } from "../data/sampleData";
 
 /** Placeholder oil-slick extent polygons. */
 export function createSlickPolygonLayer(visible: boolean) {
-  const features: Feature<Polygon>[] = SLICK_POLYGONS.map((slick) => ({
-    type: "Feature",
+  const features = SLICK_POLYGONS.map((slick) => ({
+    type: "Feature" as const,
     properties: { id: slick.id, confidence: slick.confidence },
-    geometry: { type: "Polygon", coordinates: [slick.ring] },
+    geometry: { type: "Polygon" as const, coordinates: [slick.ring] },
   }));
 
   return new GeoJsonLayer({
